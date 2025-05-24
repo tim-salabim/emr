@@ -8,9 +8,9 @@ library(leaflet.extras2)
 library(leastcostpath)
 library(exactextractr)
 
-r = rast("/home/tim/Downloads/50408_DGM_tif/dgm_50408.tif")
+r = rast("data/dgm_50408.tif")
 pts = st_transform(
-  st_read("/home/tim/Downloads/50408_DGM_tif/pts2.gpkg")
+  st_read("data/pts2.gpkg")
   , crs = st_crs(r)
 )
 
@@ -68,7 +68,7 @@ slp30[slp30 > 30] = NA
 
 m = mapview(slp, col.regions = mapviewPalette("mapviewSpectralColors"), maxBytes = 10e6) + 
   # mapview(slp_cls, col.regions = mapviewPalette("mapviewSpectralColors")) + 
-  lcp
+  mapview(lcp, color = "red", lwd = 3)
 
 loop = m@map |> 
   addProviderTiles(
@@ -88,9 +88,9 @@ loop = m@map |>
     )
   ) |>
   leafem::updateLayersControl(addBaseGroups = c("ortho", "terrain")) |>
-  leaflet.extras::addControlGPS()
+  leaflet.extras::addControlGPS(options = leaflet.extras::gpsOptions(activate = TRUE))
 
-mapshot(loop, url = "/home/tim/tappelhans/privat/r_stuff/huette/emr.html")
+mapshot(loop, url = "index.html")
 
 writeRaster(r, "/home/tim/Downloads/50408_DGM_tif/dgm_50408_NA.tif")
 writeRaster(slp, "/home/tim/Downloads/50408_DGM_tif/dgm_50408_slp.tif")
