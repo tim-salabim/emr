@@ -37,34 +37,34 @@ lcp = create_lcp(
 
 slp = terrain(r_crp)
 
-mapview(slope_rst, maxBytes = 100e6) + lcp
+# mapview(slope_rst, maxBytes = 100e6) + lcp
 
-m = c(
-  0, 10, 1
-  , 10, 20, 2
-  , 20, 30, 3
-  , 30, 40, 4
-  , 40, 90, 5
-)
-rcl_mat = matrix(m, ncol = 3, byrow = TRUE)
+# m = c(
+#   0, 10, 1
+#   , 10, 20, 2
+#   , 20, 30, 3
+#   , 30, 40, 4
+#   , 40, 90, 5
+# )
+# rcl_mat = matrix(m, ncol = 3, byrow = TRUE)
 
-slp_cls = classify(
-  slp
-  , rcl_mat
-)
+# slp_cls = classify(
+#   slp
+#   , rcl_mat
+# )
 
-strs = st_as_stars(slp)
-lcp_extr = st_transform(lcp, st_crs(slp))
-slp_prfl_strs = st_extract(st_as_stars(r), at = lcp_extr)
+# strs = st_as_stars(slp)
+# lcp_extr = st_transform(lcp, st_crs(slp))
+# slp_prfl_strs = st_extract(st_as_stars(r), at = lcp_extr)
 
-slp_profile = extractAlong(r, lcp, xy = TRUE)
-slp_profile_sf = st_as_sf(slp_profile, coords = c("x", "y"), crs = st_crs(pts)) 
+# slp_profile = extractAlong(r, lcp, xy = TRUE)
+# slp_profile_sf = st_as_sf(slp_profile, coords = c("x", "y"), crs = st_crs(pts)) 
 
-slp_cls_profile = extractAlong(slp_cls, lcp)
-hgt_profile = extractAlong(r_crp, lcp)
+# slp_cls_profile = extractAlong(slp_cls, lcp)
+# hgt_profile = extractAlong(r_crp, lcp)
 
-slp30 = slp
-slp30[slp30 > 30] = NA
+# slp30 = slp
+# slp30[slp30 > 30] = NA
 
 m = mapview(slp, col.regions = mapviewPalette("mapviewSpectralColors"), maxBytes = 10e6) + 
   # mapview(slp_cls, col.regions = mapviewPalette("mapviewSpectralColors")) + 
@@ -87,7 +87,34 @@ loop = m@map |>
       , maxNativeZoom = 17
     )
   ) |>
-  leafem::updateLayersControl(addBaseGroups = c("ortho", "terrain")) |>
+    addProviderTiles(
+      "BasemapAT.basemap"
+      , group = "basemap"
+      , options = tileOptions(
+        maxZoom = 21
+        , maxNativeZoom = 17
+      )
+    ) |>
+      addProviderTiles(
+        "BasemapAT.surface"
+        , group = "surface"
+        , options = tileOptions(
+          maxZoom = 21
+          , maxNativeZoom = 17
+        )
+      ) |>
+        addProviderTiles(
+          "BasemapAT.overlay"
+          , group = "labels"
+          , options = tileOptions(
+            maxZoom = 21
+            , maxNativeZoom = 17
+          )
+        ) |>
+  leafem::updateLayersControl(
+    addOverlayGroups = ("labels")
+    , addBaseGroups = c("ortho", "terrain", "basemap", "surface")
+  ) |>
   leaflet.extras::addControlGPS(options = leaflet.extras::gpsOptions(activate = TRUE))
 
 mapshot(loop, url = "index.html")
