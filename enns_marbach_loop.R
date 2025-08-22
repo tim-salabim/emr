@@ -66,9 +66,11 @@ slp = terrain(r_crp)
 # slp30 = slp
 # slp30[slp30 > 30] = NA
 
+trck = st_read("data/15 August 2025 at 1313.kmz")
+
 m = mapview(slp, col.regions = mapviewPalette("mapviewSpectralColors"), maxBytes = 10e6) + 
   # mapview(slp_cls, col.regions = mapviewPalette("mapviewSpectralColors")) + 
-  mapview(lcp, color = "red", lwd = 3)
+  mapview(trck, color = "red", lwd = 3)
 
 loop = m@map |> 
   addProviderTiles(
